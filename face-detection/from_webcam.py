@@ -8,16 +8,23 @@ from util import crop_image
 
 import click
 import time
+import os
 
 class FaceDetector:
     model = None
+    _cache_path = resource_filename(__name__, './model/cache')
     def __init__(self, model, device='CPU', confidence_thr=0.5, overlap_thr=0.7):
         if self.model == None:
+            os.makedirs(self._cache_path, exist_ok=True)
+            enable_caching = True
+            config_dict = {"CACHE_DIR": str(self._cache_path)} if enable_caching else {}
+
             # load and compile the model
             ie = Core()
             model = ie.read_model(model=model)
-            compiled_model = ie.compile_model(model=model, device_name=device)
+            compiled_model = ie.compile_model(model=model, device_name=device, config=config_dict)
             self.model = compiled_model
+
 
         self.output_scores_layer = self.model.output(0)
         self.output_boxes_layer  = self.model.output(1)
@@ -53,7 +60,7 @@ class FaceDetector:
         bboxes_image_coord = np.apply_along_axis(_convert_bbox_format, axis = 2, arr=filtered_boxes)
 
         # apply non-maximum supressions
-        bboxes_image_coord, indexes = non_max_suppression(bboxes_image_coord.reshape([-1,4]), overlapThresh=0.5)
+        bboxes_image_coord, indexes = non_max_suppression(bboxes_image_coord.reshape([-1,4]), overlapThresh=self.overlap_thr)
         return bboxes_image_coord, filtered_scores[indexes]
 
     def draw_bboxes(self, image, bboxes, color=[0,255,0]):
@@ -83,6 +90,9 @@ def main(video, model, confidence):
     detector = FaceDetector(model, device='CPU', confidence_thr=confidence, overlap_thr=0.7)
     video = cv2.VideoCapture(video)
 
+    n_frames = 0
+    fps_cum = 0.0
+    fps_avg = 0.0
     while True:
         ret, frame = video.read()
         assert ret == True, 'Failed to video source of end of the file'
@@ -91,13 +101,13 @@ def main(video, model, confidence):
         faces, scores = detector.inference(frame)
         end_time = time.perf_counter()
 
-        # detector.draw_bboxes(frame, faces, color=[0, 255, 0])
-        frame = draw_boxes_with_scores(frame, faces, scores)
-        frame = put_text_on_image(frame, text='FPS: {:.2f}'.format( 1.0/(end_time - start_time) ))
+        n_frames += 1
+        fps = 1.0 / (end_time - start_time)
+        fps_cum += fps
+        fps_avg = fps_cum / n_frames
 
-        # for i, face in enumerate(faces):
-        #     face_img = crop_image(frame, face)
-        #     cv2.imshow('face#{}'.format(i), face_img)
+        frame = draw_boxes_with_scores(frame, faces, scores)
+        frame = put_text_on_image(frame, text='FPS: {:.2f}'.format( fps_avg ))
 
         cv2.imshow('webcam', frame)
         k = cv2.waitKey(1) & 0xFF
