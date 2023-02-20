@@ -1,7 +1,5 @@
 # OpenVINO-exploration
 
-# OpenVINO
-
 ```
 $ pip install openvino-dev
 ```
