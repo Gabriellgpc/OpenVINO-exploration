@@ -8,9 +8,9 @@ import click
 
 @click.command()
 @click.option('--model', default=resource_filename(__name__, './model/v3-small_224_1.0_float.xml'))
-@click.option('--image-path', '--image', default=resource_filename(__name__, './images/burguer.jpg'))
+@click.option('--image-path', '--image', default=resource_filename(__name__, '../data/images/burguer.jpg'))
 def main(model, image_path):
-    IMAGENET_CLASS_LIST = resource_filename( __name__, './imagenet_2012.txt')
+    IMAGENET_CLASS_LIST = resource_filename( __name__, '../data/imagenet_2012.txt')
     INPUT_SIZE = [224,224]
 
     # load the input image and preprocess it
