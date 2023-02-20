@@ -3,7 +3,8 @@ from openvino.runtime import Core
 import numpy as np
 import cv2
 
-from util import non_max_suppression, put_text_on_image
+from util import non_max_suppression, put_text_on_image, draw_boxes_with_scores
+from util import crop_image
 
 import click
 import time
@@ -86,15 +87,17 @@ def main(video, model, confidence):
         ret, frame = video.read()
         assert ret == True, 'Failed to video source of end of the file'
 
-        start_time = time.process_time()
+        start_time = time.perf_counter()
         faces, scores = detector.inference(frame)
-        end_time = time.process_time()
+        end_time = time.perf_counter()
 
-        detector.draw_bboxes(frame, faces, color=[0, 255, 0])
-
+        # detector.draw_bboxes(frame, faces, color=[0, 255, 0])
+        frame = draw_boxes_with_scores(frame, faces, scores)
         frame = put_text_on_image(frame, text='FPS: {:.2f}'.format( 1.0/(end_time - start_time) ))
 
-        # print('#Faces', len(faces))
+        # for i, face in enumerate(faces):
+        #     face_img = crop_image(frame, face)
+        #     cv2.imshow('face#{}'.format(i), face_img)
 
         cv2.imshow('webcam', frame)
         k = cv2.waitKey(1) & 0xFF
