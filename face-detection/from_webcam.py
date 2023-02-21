@@ -3,8 +3,8 @@ from openvino.runtime import Core
 import numpy as np
 import cv2
 
-from util import non_max_suppression, put_text_on_image, draw_boxes_with_scores
-from util import crop_image
+from utils import non_max_suppression, put_text_on_image, draw_boxes_with_scores
+from utils import crop_image
 
 import click
 import time

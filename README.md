@@ -22,9 +22,11 @@ $ omz_converter -d model --name mobilenet-v3-small-1.0-224-tf
 * https://github.com/openvinotoolkit
 
 # TODO
-- [ ] Use cache in face detection exploration
+- [x] Use cache in face detection exploration
+- [ ] Face detection Model server
+- [ ] Face similarity analysis
+- [ ] Face similarity analysis model server
 - [ ] Optimize preprocessing
 - [ ] Face detection from TensorFlow or Pytorch
-- [ ] Face detection Model server
 - [ ] Vision super resolution
 - [ ] Vision deblur
