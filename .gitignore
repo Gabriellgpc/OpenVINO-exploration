@@ -1,3 +1,5 @@
 tensorflow-to-openvino/model/mob*
 __pycache__
 *cache*
+
+gpt2-chat-openvino/model/*
