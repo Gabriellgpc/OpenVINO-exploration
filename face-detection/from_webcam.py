@@ -25,7 +25,6 @@ class FaceDetector:
             compiled_model = ie.compile_model(model=model, device_name=device, config=config_dict)
             self.model = compiled_model
 
-
         self.output_scores_layer = self.model.output(0)
         self.output_boxes_layer  = self.model.output(1)
         self.confidence_thr = confidence_thr
